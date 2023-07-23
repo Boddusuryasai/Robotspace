@@ -3,7 +3,7 @@ import MovieList from "./MovieList";
 import Paginate from "./Paginate";
 import Shimmerui from "./Shimmerui";
 import toast, { Toaster } from "react-hot-toast";
-
+const cache = {}; // Cache to store search results
 const Main = () => {
   const [name, setName] = useState("");
   const [movie, setMovie] = useState(null);
@@ -17,13 +17,21 @@ const Main = () => {
       clearTimeout(timer);
     };
   }, [name]);
+ 
   const fetchMovies = async () => {
     if (name) {
       setIsLoading(true);
       try {
-        const response = await fetch(`api/movies/search?query=${name}`);
-        const data = await response.json();
-        setMovie(data.results);
+        // Check if the search query is in the cache
+        if (cache[name]) {
+          setMovie(cache[name]);
+          console.log(cache[name])
+        } else {
+          const response = await fetch(`api/movies/search?query=${name}`);
+          const data = await response.json();
+          setMovie(data.results);
+          cache[name] = data.results; // Store the search results in the cache
+        }
         setCurrentPage(1);
       } catch (error) {
         toast.error("An error occurred while fetching data.");
