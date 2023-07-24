@@ -3,27 +3,27 @@ import MovieList from "./MovieList";
 import Paginate from "./Paginate"
 import Shimmerui from "./Shimmerui";
 import toast, { Toaster } from "react-hot-toast";
-const cache = {}; // Cache to store search results
 const Main = () => {
   const [name, setName] = useState("");
   const [movie, setMovie] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
-
   useEffect(() => {
-    setCurrentPage(1)
-    const timer = name && setTimeout(fetchMovies, 200);
+    setCurrentPage(1);
+    const timer = name && setTimeout(() => fetchMovies(1), 200);
     return () => {
-      clearTimeout(timer);
+        clearTimeout(timer);
     };
-  }, [name]);
+}, [name]);
 
-  useEffect(() => {
-     name && fetchMovies()
-  }, [currentPage]);
+useEffect(() => {
+    name && fetchMovies(currentPage);
+}, [currentPage]);
 
-  const fetchMovies = async () => {
+  
+
+  const fetchMovies = async (currentPage) => {
     if (name) {
       setIsLoading(true);
       try {
