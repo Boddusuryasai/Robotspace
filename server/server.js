@@ -9,12 +9,13 @@ app.use(cors())
 app.use(express.json());
 
 app.get('/api/movies/search', async (req, res) => {
-  const { query } = req.query;
+  const { query , page } = req.query;
   try {
     const response = await axios.get(`${TMDB_API_BASE_URL}/search/movie`, {
       params: {
         api_key: process.env.TMDB_API_KEY,
-        query: query
+        query: query,
+        page: page || 1
       },
     });
 

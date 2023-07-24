@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MovieList from "./MovieList";
-import Paginate from "./Paginate";
+import Paginate from "./Paginate"
 import Shimmerui from "./Shimmerui";
 import toast, { Toaster } from "react-hot-toast";
 const cache = {}; // Cache to store search results
@@ -9,30 +9,31 @@ const Main = () => {
   const [movie, setMovie] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const moviesPerPage = 2;
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
+    setCurrentPage(1)
     const timer = name && setTimeout(fetchMovies, 200);
     return () => {
       clearTimeout(timer);
     };
   }, [name]);
- 
+
+  useEffect(() => {
+     name && fetchMovies()
+  }, [currentPage]);
+
   const fetchMovies = async () => {
     if (name) {
       setIsLoading(true);
       try {
-        // Check if the search query is in the cache
-        if (cache[name]) {
-          setMovie(cache[name]);
-          console.log(cache[name])
-        } else {
-          const response = await fetch(`api/movies/search?query=${name}`);
+          const response = await fetch(
+            `api/movies/search?query=${name}&page=${currentPage}`
+          );
           const data = await response.json();
           setMovie(data.results);
-          cache[name] = data.results; // Store the search results in the cache
-        }
-        setCurrentPage(1);
+          setTotalPages(data.total_pages);
+        
       } catch (error) {
         toast.error("An error occurred while fetching data.");
       } finally {
@@ -40,15 +41,16 @@ const Main = () => {
       }
     }
   };
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
-  // Calculate the index range for movies to be displayed on the current page
-  const indexOfLastMovie = currentPage * moviesPerPage;
-  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
-  const currentMovies = movie?.slice(indexOfFirstMovie, indexOfLastMovie);
-
-  // Function to handle pagination and change the page number
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
@@ -78,12 +80,8 @@ const Main = () => {
           </div>
         ) : movie && name !== "" ? (
           <>
-            <MovieList movie={currentMovies} />
-            <Paginate
-              movie={movie}
-              paginate={paginate}
-              currentPage={currentPage}
-            />
+            <MovieList movie={movie} />
+            <Paginate handleNextPage={handleNextPage}  handlePrevPage={handlePrevPage} currentPage={currentPage}  totalPages={totalPages}/>
           </>
         ) : (
           <div className="flex justify-center mt-4">
