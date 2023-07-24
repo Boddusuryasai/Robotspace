@@ -13,3 +13,7 @@
  ![Home](./moviefinder/Assets/HOME.PNG)
  ![Movie%20Not%20found](./moviefinder/Assets/RESULTNOTFOUND.PNG)
  ![Movie%20Result](./moviefinder/Assets/RESULT.PNG)
+
+
+ Version2: In the branch v2 , pagination is implemented directly by using backend API 
+ https://github.com/Boddusuryasai/Robotspace/tree/v2
